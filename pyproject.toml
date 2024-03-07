@@ -1,0 +1,38 @@
+[tool.poetry]
+name = "galore-torch"
+version = "1.0"
+description = "GaLore: Memory-Efficient LLM Training by Gradient Low-Rank Projection"
+authors = ["Jiawei Zhao <jiawei@caltech.edu>"]
+license = "Apache 2.0"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+transformers = "^4.31.0"
+tokenizers = "*"
+datasets = "*"
+peft = "*"
+wandb = "*"
+loguru = "*"
+nvitop = "*"
+lion-pytorch = "*"
+matplotlib = "*"
+bitsandbytes = "*"
+scipy = "*"
+scikit-learn = "*"
+evaluate = "*"
+pyarrow = { version = "^14.0.2"}
+torch = { version = "^2.1.0", source="torch"}
+
+[[tool.poetry.source]]
+name = "torch"
+url = "https://download.pytorch.org/whl/cu121"
+priority = "explicit"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.urls]
+homepage = "https://github.com/jiaweizzhao/GaLore"
