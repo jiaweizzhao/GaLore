@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+title: "GaLore: Memory-Efficient LLM Training by Gradient Low-Rank Projection"
+version: 1.0.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: "Jiawei"
+    given-names: "Zhao"
+year: 2024
+repository-code: "https://arxiv.org/abs/2403.03507"
