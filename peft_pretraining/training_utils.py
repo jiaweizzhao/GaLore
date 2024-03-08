@@ -6,7 +6,7 @@ from torch.optim.lr_scheduler import LambdaLR
 import transformers
 
 
-def get_scheculer(
+def get_scheduler(
     optimizer,
     *,
     scheduler_type,
