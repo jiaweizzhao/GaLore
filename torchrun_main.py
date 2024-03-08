@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import json
 import random
@@ -24,6 +25,8 @@ from loguru import logger
 from peft_pretraining import training_utils, args_utils
 from peft_pretraining.dataloader import PreprocessedIterableDataset
 from peft_pretraining.modeling_llama import LlamaForCausalLM
+
+from torch.distributed.elastic.multiprocessing.errors import record
 
 import bitsandbytes as bnb
 from galore_torch import GaLoreAdamW, GaLoreAdamW8bit, GaLoreAdafactor
@@ -73,6 +76,10 @@ def parse_args(args):
     
     # disable ddp, single_gpu
     parser.add_argument("--single_gpu", default=False, action="store_true")
+
+    # logging
+    parser.add_argument("--log_level", type=str, default="INFO",
+                        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
     
     args = parser.parse_args(args)
 
@@ -126,6 +133,7 @@ def evaluate_model(model, preprocess_batched, pad_idx, global_rank, world_size, 
     return total_loss, evaluated_on_tokens
 
 
+@record
 def main(args):
     torch.manual_seed(args.seed)
     np.random.seed(args.seed)
@@ -285,7 +293,7 @@ def main(args):
     logger.info(f"Total params: {sum(p.numel() for p in model.parameters()) / 1_000_000:.2f}M")
     logger.info(f"Trainable params: {sum(p.numel() for p in model.parameters() if p.requires_grad) / 1_000_000:.2f}M")
     logger.info(f"Total params with GaLore enabled: {sum(p.numel() for p in galore_params) / 1_000_000:.2f}M")
-    logger.info(f"Saving model to {args.save_dir} every {args.save_every} update steps")
+    logger.info(f"Will be saving model to {args.save_dir} every {args.save_every} update steps")
     
     layer_wise_flag = False
     if args.optimizer.lower() == "adam":
@@ -334,6 +342,7 @@ def main(args):
     elif args.optimizer.lower() == 'galore_adamw8bit_per_layer':
         # TODO: seems scheduler call twice in one update step, need to check, for now double the num_training_steps, warmup_steps and update_proj_gap
         optimizer_dict = {}
+        logger.debug("Using layer-wise optimizer")
         for p in model.parameters():
             if p.requires_grad:
                 if id(p) in id_galore_params:
@@ -345,7 +354,7 @@ def main(args):
         scheduler_dict = {}
         for p in model.parameters():
             if p.requires_grad:
-                scheduler_dict[p] = training_utils.get_scheculer(
+                scheduler_dict[p] = training_utils.get_scheduler(
                     optimizer=optimizer_dict[p],
                     scheduler_type=args.scheduler,
                     num_training_steps=args.num_training_steps * 2,
@@ -360,6 +369,7 @@ def main(args):
             optimizer_dict[p].zero_grad()
             scheduler_dict[p].step()
 
+        logger.debug("Registering hook onto every parameter")
         # Register the hook onto every parameter
         for p in model.parameters():
             if p.requires_grad:
@@ -371,7 +381,8 @@ def main(args):
         raise ValueError(f"Optimizer {args.optimizer} not supported")
 
     if not layer_wise_flag:
-        scheduler = training_utils.get_scheculer(
+        logger.debug("Using single optimizer")
+        scheduler = training_utils.get_scheduler(
             optimizer=optimizer,
             scheduler_type=args.scheduler,
             num_training_steps=args.num_training_steps,
@@ -398,7 +409,7 @@ def main(args):
     # ##############################
 
     for batch_idx, batch in enumerate(dataloader):
-
+        logger.debug(f"Starting update step {local_step}, global step {global_step}")
         global_step += 1
         local_step += 1
 
@@ -412,8 +423,11 @@ def main(args):
         labels[labels == pad_idx] = -100
         tokens_seen += (batch["input_ids"] != pad_idx).sum().item() * world_size
 
+        logger.debug(f"Training on {batch['input_ids'].shape[0]} examples, {batch['input_ids'].shape[1]} tokens")
         loss = model(**batch, labels=labels).loss
         scaled_loss = loss / args.gradient_accumulation
+        logger.debug(f"Loss at step {local_step}: {loss.item()}")
+        logger.debug(f"Backpropagating loss")
         scaled_loss.backward()
 
         if global_step % args.gradient_accumulation != 0:
@@ -423,11 +437,13 @@ def main(args):
         # The below code is only executed during the update step
         
         # add grad clipping
+        logger.debug(f"Clipping gradients")
         if args.grad_clipping != 0.0: torch.nn.utils.clip_grad_norm_(trainable_params, args.grad_clipping)
 
         if global_rank == 0: pbar.update(1)
         
         if not layer_wise_flag:
+            logger.debug(f"Stepping optimizer and scheduler")
             optimizer.step()
             scheduler.step()
             optimizer.zero_grad()
@@ -469,6 +485,8 @@ def main(args):
             }
             with open(f"{args.save_dir}/wandb.json", "w") as f:
                 json.dump(wandb_info, f, indent=4)
+        
+        logger.debug(f"Update step {update_step} finished in {update_time:.2f} seconds")
 
         # evaluation
         if update_step % args.eval_every == 0:
@@ -567,4 +585,8 @@ def main(args):
 if __name__ == "__main__":
     print("Starting script")
     args = parse_args(None)
+
+    logger.remove()
+    logger.add(sys.stderr, level=args.log_level)
+    
     main(args)
