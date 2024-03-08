@@ -32,13 +32,13 @@ optimizer = GaLoreAdamW(param_groups, lr=0.01)
 For an easy setup and execution on GPUs, use the provided Docker Compose configuration:
 
 ```
-docker-compose up
+docker compose up
 ```
 
 This command initiates the GaLore 7b training process using the settings defined in the docker-compose.yml file, leveraging Docker for a seamless execution environment.
 
 ```
-docker-compose run galore bash
+docker compose run galore bash
 ```
 
 This command opens a bash shell within the Docker container, allowing you to interact with the environment and execute commands as needed.
