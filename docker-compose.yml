@@ -29,3 +29,4 @@ services:
       --eval_every 1000
       --single_gpu
       --optimizer galore_adamw8bit_per_layer
+      --log_level DEBUG
