@@ -28,6 +28,22 @@ param_groups = [{'params': non_galore_params},
 optimizer = GaLoreAdamW(param_groups, lr=0.01)
 ```
 
+## Running with Docker
+For an easy setup and execution on GPUs, use the provided Docker Compose configuration:
+
+```
+docker-compose up
+```
+
+This command initiates the GaLore 7b training process using the settings defined in the docker-compose.yml file, leveraging Docker for a seamless execution environment.
+
+```
+docker-compose run galore bash
+```
+
+This command opens a bash shell within the Docker container, allowing you to interact with the environment and execute commands as needed.
+
+
 ## Benchmark 1: Pre-Training LLaMA on C4 dataset
 `torchrun_main.py` is the main script for training LLaMA models on C4 with GaLore. Our benchmark scripts for various sizes of models are in `scripts/benchmark_c4` folder.
 For example, to train a 60m model on C4, do the following:
