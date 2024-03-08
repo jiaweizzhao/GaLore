@@ -409,9 +409,9 @@ def main(args):
     # ##############################
 
     for batch_idx, batch in enumerate(dataloader):
-        logger.debug(f"Starting update step {local_step}, global step {global_step}")
         global_step += 1
         local_step += 1
+        logger.debug(f"Starting update step {local_step}, global step {global_step}")
 
         if update_step > args.num_training_steps:
             logger.info(f"Reached max number of update steps (f{args.num_training_steps}). Stopping training.")
