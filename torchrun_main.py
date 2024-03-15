@@ -167,7 +167,7 @@ def main(args):
         logger.info(f"{k:30} {v}")
     logger.info("*" * 40)
 
-    data = datasets.load_dataset("c4", "en", split="train", streaming=True)
+    data = datasets.load_dataset("allenai/c4", "en", split="train", streaming=True)
 
     seed_for_shuffle = 42 
     
