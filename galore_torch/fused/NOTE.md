@@ -205,7 +205,7 @@ _Note:_ Passing in the additional flag `--verbose` will show `triton` autotuning
 
 #### Next Steps
 
-- [] Implement `FusedGaLoreOptimizer`
-- [] `Cutlass` - given fixed GEMM shape, experiment with `Cutlass` GEMMs (`split-k`, `stream-k`, fast `tensorops`). Interestingly, profiling `torch.matmul` for down projection shows that `cuBlas` dispatches to a `Cutlass` kernel of shape `128x128x16`.
-- [] Repeat with `AdamW8bit`
-- [] More detailed analysis of `torch.compile` performance
+- [ ] Implement `FusedGaLoreOptimizer`
+- [ ] `Cutlass` - given fixed GEMM shape, experiment with `Cutlass` GEMMs (`split-k`, `stream-k`, fast `tensorops`). Interestingly, profiling `torch.matmul` for down projection shows that `cuBlas` dispatches to a `Cutlass` kernel of shape `128x128x16`.
+- [ ] Repeat with `AdamW8bit`
+- [ ] More detailed analysis of `torch.compile` performance
