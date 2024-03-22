@@ -16,7 +16,7 @@ from galore_torch.fused.triton_utils.kernels.matmul import get_mm_heuristics, to
 
 logger = logging.getLogger(__name__)
 
-AUTOTUNER_TOP_K = 200
+AUTOTUNER_TOP_K = 50
 
 
 def set_tuner_top_k(k):

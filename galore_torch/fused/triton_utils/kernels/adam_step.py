@@ -9,7 +9,7 @@ from galore_torch.fused.triton_utils.custom_autotune import Config, autotune
 BETA1, BETA2 = 0.9, 0.999
 EPS = 1e-8
 
-AUTOTUNER_TOP_K = 100
+AUTOTUNER_TOP_K = 10
 
 
 def get_configs_for_adam(num_warps=[2, 4, 8], block_sizes=[512, 1024, 2048]):

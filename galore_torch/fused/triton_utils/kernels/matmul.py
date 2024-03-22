@@ -14,7 +14,7 @@ TRITON_ACC_TYPES = {
     torch.int8: (torch.int32,),
 }
 
-AUTOTUNER_TOP_K = 200
+AUTOTUNER_TOP_K = 50
 
 
 def set_tuner_top_k(k):

@@ -98,15 +98,6 @@ def run_test(kernel, exp_avg, exp_avg2, grad, proj_matrix, params, allow_tf32):
     )
 
 
-def run_benchmark(args):
-    from test_utils import get_benchmark
-
-    benchmark = get_benchmark(
-        args.M,
-        args.N,
-    )
-
-
 def run(args):
     dtype = getattr(torch, args.dtype)
     allow_tf32 = args.allow_tf32
@@ -123,7 +114,7 @@ def run(args):
         from test_utils import get_benchmark
 
         benchmark = get_benchmark(M, N, dtype, allow_tf32=allow_tf32)
-        save_path = f'benchmark_{M}x{N}_{rank}_{args.dtype}_{"tf32" if allow_tf32 else "no-tf32"}.txt'
+        save_path = f'benchmark_{M}x{N}_{rank}_{args.dtype}_{"tf32" if allow_tf32 else "no-tf32"}'
         print(
             f"Running benchmark for {M}x{N}, dtype {args.dtype}, allow_tf32 {allow_tf32}",
             flush=True,
@@ -157,7 +148,7 @@ if __name__ == "__main__":
     parser.add_argument("--M", type=int, default=4096, help="Grad (param) shape M")
     parser.add_argument("--N", type=int, default=4096, help="Grad (param) shape N")
     parser.add_argument(
-        "--rank", type=int, default=16, help="Rank of GaLore projection"
+        "--rank", type=int, default=128, help="Rank of GaLore projection"
     )
     parser.add_argument(
         "--dtype",
