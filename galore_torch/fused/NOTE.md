@@ -136,7 +136,6 @@ Max err: 0.000003 Relative err: 0.000004
 Max err: 0.000002 Relative err: 0.000002
 -> params (after update):
 Max err: 0.000000 Relative err: 0.000000
-
 ```
 
 #### Discussion
@@ -178,8 +177,6 @@ _Accuracy_
   python tests/test_fused_kernels.py --mode=test --kernel=hybrid --M=4096 --N=4096 --rank=128 --allow_tf32
   ```
 
-````
-
 _Benchmark_
 
 - Benchmark across all kernels without `tf32`:
@@ -212,4 +209,3 @@ _Note:_ Passing in the additional flag `--verbose` will show `triton` autotuning
 - [] `Cutlass` - given fixed GEMM shape, experiment with `Cutlass` GEMMs (`split-k`, `stream-k`, fast `tensorops`). Interestingly, profiling `torch.matmul` for down projection shows that `cuBlas` dispatches to a `Cutlass` kernel of shape `128x128x16`.
 - [] Repeat with `AdamW8bit`
 - [] More detailed analysis of `torch.compile` performance
-````
