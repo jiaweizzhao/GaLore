@@ -12,7 +12,7 @@ As a gradient projection method, GaLore is independent of the choice of optimize
 ## News
 Thanks everyone for the interest in GaLore! 
 
-**We are working on the offical release of GaLore.** In the meanwhile, please feel free to try the pre-release version and provide feedback to us. Currently, the pre-release version (e.g., GaLore optimizers) should provide a decent memory reduction and accurate simulation of GaLore algorithm. 
+**We are working on the official release of GaLore.** In the meanwhile, please feel free to try the pre-release version and provide feedback to us. Currently, the pre-release version (e.g., GaLore optimizers) should provide a decent memory reduction and accurate simulation of GaLore algorithm. 
 
 The official release of GaLore will include:
 
