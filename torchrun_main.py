@@ -284,7 +284,8 @@ def main(args):
     logger.info(f"\n{model}\n")
     logger.info(f"Total params: {sum(p.numel() for p in model.parameters()) / 1_000_000:.2f}M")
     logger.info(f"Trainable params: {sum(p.numel() for p in model.parameters() if p.requires_grad) / 1_000_000:.2f}M")
-    logger.info(f"Total params with GaLore enabled: {sum(p.numel() for p in galore_params) / 1_000_000:.2f}M")
+    if 'galore' in args.optimizer.lower():
+        logger.info(f"Total params with GaLore enabled: {sum(p.numel() for p in galore_params) / 1_000_000:.2f}M")
     logger.info(f"Saving model to {args.save_dir} every {args.save_every} update steps")
     
     layer_wise_flag = False
