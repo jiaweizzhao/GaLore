@@ -10,7 +10,7 @@ from torch.optim import Optimizer
 from transformers.utils.versions import require_version
 
 from .galore_projector import GaLoreProjector
-from .galore_projector_sketching import GaLoreProjectorSketching
+from .galore_projector_tensor import GaLoreProjectorTensor
 
 
 class AdamW(Optimizer):
@@ -92,8 +92,10 @@ class AdamW(Optimizer):
                 # GaLore Projection
                 if "rank" in group:
                     if "projector" not in state:
-                        state["projector"] = GaLoreProjector(group["rank"], update_proj_gap=group["update_proj_gap"], scale=group["scale"], proj_type=group["proj_type"])
-                    
+                        if group['dim'] <=2:
+                            state["projector"] = GaLoreProjector(group["rank"], update_proj_gap=group["update_proj_gap"], scale=group["scale"], proj_type=group["proj_type"])
+                        else:
+                            state["projector"] = GaLoreProjectorTensor(group["rank"], update_proj_gap=group["update_proj_gap"], scale=group["scale"], proj_type=group["proj_type"])
                     grad = state["projector"].project(grad, state["step"])
 
                 # State initialization
