@@ -88,7 +88,10 @@ class AdamW(Optimizer):
                 
                 if "step" not in state:
                     state["step"] = 0
-                        
+                
+                if 'dim' not in group:
+                    group['dim'] = 2
+                    
                 # GaLore Projection
                 if "rank" in group:
                     if "projector" not in state:
