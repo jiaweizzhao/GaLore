@@ -85,7 +85,6 @@ class GaLoreProjector:
         #make the smaller matrix always to be orthogonal matrix
         if type=='right':
             B = Vh[:rank, :]
-
             if not float_data:
                 B = B.to(original_device).type(original_type)
             return B
