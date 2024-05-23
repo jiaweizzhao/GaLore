@@ -105,6 +105,3 @@ class GaLoreProjector:
             return [A, B]
         else:
             raise ValueError('type should be left, right or full')
-
-
-
