@@ -10,9 +10,9 @@ As a gradient projection method, GaLore is independent of the choice of optimize
 </div>
 
 ## News
-Thanks everyone for the interest in GaLore! 
+Thanks everyone for your interest in GaLore! 
 
-**We are working on the offical release of GaLore.** In the meanwhile, please feel free to try the pre-release version and provide feedback to us. Currently, the pre-release version (e.g., GaLore optimizers) should provide a decent memory reduction and accurate simulation of GaLore algorithm. 
+**We are working on the official release of GaLore.** In the meantime, please feel free to try the pre-release version and provide feedback to us. Currently, the pre-release version (e.g., GaLore optimizers) should provide a decent memory reduction and accurate simulation of GaLore algorithm. 
 
 The official release of GaLore will include:
 
@@ -49,6 +49,8 @@ pip install -e .
 pip install -r exp_requirements.txt
 ```
 
+Our experiment scripts are tested on Python 3.8 with PyTorch 2.1.
+
 ## Usage
 
 ### Save optimizer memory using GaLore optimizers
@@ -62,7 +64,7 @@ optimizer = GaLoreAdamW(param_groups, lr=0.01)
 ```
 ### Save weight gradient memory using per-layer weight updates
 
-We use `register_post_accumulate_grad_hook` provided by [PyTorch](https://pytorch.org/tutorials/intermediate/optimizer_step_in_backward_tutorial.html) to enable per-layer weight updates. An example is shown below:
+We use `register_post_accumulate_grad_hook` provided by [PyTorch](https://pytorch.org/tutorials/intermediate/optimizer_step_in_backward_tutorial.html) (`torch>=2.1.0`) to enable per-layer weight updates. An example is shown below:
 
 ```python
 # define an optimizer for each parameter p, and store them in optimizer_dict
