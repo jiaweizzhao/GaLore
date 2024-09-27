@@ -10,22 +10,14 @@ As a gradient projection method, GaLore is independent of the choice of optimize
 </div>
 
 ## News
-Thanks everyone for your interest in GaLore! 
 
-**We are working on the official release of GaLore.** In the meantime, please feel free to try the pre-release version and provide feedback to us. Currently, the pre-release version (e.g., GaLore optimizers) should provide a decent memory reduction and accurate simulation of GaLore algorithm. 
 
-The official release of GaLore will include:
+- **2024-09-01**: We are working on GaLore 2, which is a more efficient and accessible version of GaLore. Please stay tuned!
+- **2024-07-11**: We release Q-GaLore: Quantized GaLore with INT4 Projection. [[paper](https://arxiv.org/abs/2407.08296)] [[code](https://github.com/VITA-Group/Q-GaLore)]
 
-1. Per-layer weight updates for multi-GPU training (DDP and FSDP) (working with [PyTorch](https://pytorch.org/)).
-2. Memory-efficient low-rank gradient accumulation (working with [PyTorch](https://pytorch.org/)).
-3. Optimized `GaLoreAdamW8bit` (working with [bitsandbytes](https://github.com/TimDettmers/bitsandbytes)).
+- **2024-07-01**: GaLore is accepted to ICML 2024 as Oral! 
 
-We would like to express our gratitude to the community members who have been actively working on integrating GaLore into different platforms, including [HuggingFace](https://github.com/huggingface/transformers/pull/29588), [LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory), and [Axolotl](https://github.com/OpenAccess-AI-Collective/axolotl/pull/1370). Join our Slack workspace [GaLore-Social](https://join.slack.com/t/galore-social/shared_invite/zt-2ev152px0-DguuQ5WRTLQjtq2C88HBvQ) to engage in discussions with us.
-
-## Discussion [(GaLore-Social)](https://join.slack.com/t/galore-social/shared_invite/zt-2ev152px0-DguuQ5WRTLQjtq2C88HBvQ)
-
-We welcome any discussions, questions, and feedback on GaLore. Please join our Slack workspace [GaLore-Social](https://join.slack.com/t/galore-social/shared_invite/zt-2ev152px0-DguuQ5WRTLQjtq2C88HBvQ) to discuss with us and the community.
-
+- **2024-04-20**: Please join our Slack workspace [GaLore-Social](https://join.slack.com/t/galore-social/shared_invite/zt-2ev152px0-DguuQ5WRTLQjtq2C88HBvQ) to discuss with us and the community.
 
 ## Installation
 
