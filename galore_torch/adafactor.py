@@ -193,7 +193,7 @@ class Adafactor(Optimizer):
                 if "rank" in group:
                     if "projector" not in state:
                         if group['dim'] <=2:
-                            state["projector"] = GaLoreProjector(group["rank"], update_proj_gap=group["update_proj_gap"], scale=group["scale"], proj_type=group["proj_type"])
+                            state["projector"] = GaLoreProjector(group["rank"], update_proj_gap=group["update_proj_gap"], scale=group["scale"], proj_type=group["proj_type"], proj_quant=group["proj_quant"])
                         else:
                             state["projector"] = GaLoreProjectorTensor(group["rank"], update_proj_gap=group["update_proj_gap"], scale=group["scale"], proj_type=group["proj_type"])
                     

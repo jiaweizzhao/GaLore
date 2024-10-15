@@ -70,7 +70,8 @@ def parse_args(args):
     parser.add_argument("--update_proj_gap", type=int, default=50)
     parser.add_argument("--galore_scale", type=float, default=1.0)
     parser.add_argument("--proj_type", type=str, default="std")
-    
+    parser.add_argument("--proj_quant", default=False, action="store_true")
+
     # disable ddp, single_gpu
     parser.add_argument("--single_gpu", default=False, action="store_true")
     
@@ -278,7 +279,7 @@ def main(args):
         regular_params = [p for p in model.parameters() if id(p) not in id_galore_params]
         # then call galore_adamw
         param_groups = [{'params': regular_params}, 
-                        {'params': galore_params, 'rank': args.rank, 'update_proj_gap': args.update_proj_gap, 'scale': args.galore_scale, 'proj_type': args.proj_type}]
+                        {'params': galore_params, 'rank': args.rank, 'update_proj_gap': args.update_proj_gap, 'scale': args.galore_scale, 'proj_type': args.proj_type, 'proj_quant': args.proj_quant}]
         
     # print params and trainable params
     logger.info(f"\n{model}\n")
