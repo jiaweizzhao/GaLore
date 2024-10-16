@@ -8,8 +8,16 @@ class GaLoreProjector:
         self.scale = scale
         self.ortho_matrix = None
         self.proj_type = proj_type
+        self._original_shape = None
 
     def project(self, full_rank_grad, iter):
+        # Reshape Nd tensor to 2d
+        self._original_shape = full_rank_grad.shape
+        if len(self._original_shape) > 2:
+            full_rank_grad = full_rank_grad.view(self._original_shape[0], -1)  # Flatten to 2d
+        elif len(self._original_shape) == 1:
+            full_rank_grad = full_rank_grad.view(1, -1)  # Reshape 1d to 2d
+
         if self.proj_type == 'std':
             if full_rank_grad.shape[0] >= full_rank_grad.shape[1]:
                 if self.ortho_matrix is None or iter % self.update_proj_gap == 0:
@@ -61,10 +69,10 @@ class GaLoreProjector:
         elif self.proj_type == 'full':
             full_rank_grad = torch.matmul(self.ortho_matrix[0].to(low_rank_grad.device.type), low_rank_grad) @ self.ortho_matrix[1].to(low_rank_grad.device.type)
 
-
+        full_rank_grad = full_rank_grad.view(self._original_shape)  # Restore original dimensions from 2d tensor
         return full_rank_grad * self.scale
 
-
+        
     # svd decomposition
     def get_orthogonal_matrix(self, weights, rank, type):
         module_params = weights
@@ -77,17 +85,20 @@ class GaLoreProjector:
         else:
             float_data = True
             matrix = module_params.data
-
+            
         U, s, Vh = torch.linalg.svd(matrix, full_matrices = False)
-
+        
         #make the smaller matrix always to be orthogonal matrix
         if type=='right':
+            A = U[:, :rank] @ torch.diag(s[:rank])
             B = Vh[:rank, :]
+            
             if not float_data:
                 B = B.to(original_device).type(original_type)
             return B
         elif type=='left':
             A = U[:, :rank]
+            B = torch.diag(s[:rank]) @ Vh[:rank, :]
             if not float_data:
                 A = A.to(original_device).type(original_type)
             return A
