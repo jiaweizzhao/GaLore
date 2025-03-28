@@ -8,8 +8,21 @@ class GaLoreProjector:
         self.scale = scale
         self.ortho_matrix = None
         self.proj_type = proj_type
+        self.resume = False
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self.resume = True
 
     def project(self, full_rank_grad, iter):
+        if self.resume:
+            if self.proj_type == "full" and self.ortho_matrix[0].device != full_rank_grad.data.device:
+                self.ortho_matrix = [self.ortho_matrix[0].to(full_rank_grad.data.device), self.ortho_matrix[1].to(full_rank_grad.data.device)]
+            elif self.ortho_matrix.device != full_rank_grad.data.device:
+                self.ortho_matrix = self.ortho_matrix.to(full_rank_grad.data.device)
+
+            self.resume = False
+
         if self.proj_type == 'std':
             if full_rank_grad.shape[0] >= full_rank_grad.shape[1]:
                 if self.ortho_matrix is None or iter % self.update_proj_gap == 0:
