@@ -30,6 +30,12 @@ from galore_torch import GaLoreAdamW, GaLoreAdamW8bit, GaLoreAdafactor
 
 transformers.logging.set_verbosity_error()
 
+
+def is_bf16_supported():
+    device_type = torch.accelerator.current_accelerator().type if hasattr(torch, "accelerator") else "cuda"
+    torch_accelerator_module = getattr(torch, device_type)
+    return torch_accelerator_module.is_bf16_supported()
+
 def parse_args(args):
     parser = argparse.ArgumentParser()
 
@@ -57,7 +63,7 @@ def parse_args(args):
     parser.add_argument("--save_every", type=int, default=10_000)
     parser.add_argument("--save_dir", type=str, default=None)
     parser.add_argument("--tags", type=str, default=None)
-    parser.add_argument("--dtype", type=str, default="bfloat16" if torch.cuda.is_bf16_supported() else "float32")
+    parser.add_argument("--dtype", type=str, default="bfloat16" if is_bf16_supported() else "float32")
     parser.add_argument("--workers", type=int, default=8)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--name", type=str, default="test")
@@ -131,18 +137,30 @@ def main(args):
     np.random.seed(args.seed)
     random.seed(args.seed)
 
+    device_type = torch.accelerator.current_accelerator().type if hasattr(torch, "accelerator") else "cuda"
+    torch_accelerator_module = getattr(torch, device_type)
+
     assert "LOCAL_RANK" in os.environ, "torchrun should set LOCAL_RANK"
     global_rank = int(os.environ['RANK'])
     local_rank = int(os.environ["LOCAL_RANK"])
     world_size = int(os.environ["WORLD_SIZE"])
-    torch.cuda.set_device(local_rank)
+    torch_accelerator_module.set_device(local_rank)
 
-    logger.info(f"Global rank {global_rank}, local rank {local_rank}, device: {torch.cuda.current_device()}")
+    logger.info(f"Global rank {global_rank}, local rank {local_rank}, device: {torch_accelerator_module.current_device()}")
 
-    dist.init_process_group(backend="nccl", rank=global_rank, world_size=world_size)
+    backend = "nccl"
+    if device_type == "xpu":
+        if hasattr(torch.distributed.distributed_c10d, "is_xccl_available") and
+           torch.distributed.distributed_c10d.is_xccl_available():
+            backend = "xccl"
+        else:
+            import oneccl_bindings_for_pytorch
+            backend = "ccl"
+
+    dist.init_process_group(backend=backend, rank=global_rank, world_size=world_size)
 
     logger.info("Process group initialized")
-    device = f"cuda:{local_rank}"
+    device = f"{device_type}:{local_rank}"
 
     if args.total_batch_size is not None:
         if args.gradient_accumulation is None:
@@ -546,7 +564,7 @@ def main(args):
     model.eval()
     del loss, optimizer, scheduler
     import gc; gc.collect()
-    torch.cuda.empty_cache()
+    torch_accelerator_module.empty_cache()
 
     total_loss, evaluated_on_tokens = evaluate_model(
         model, preprocess_batched, pad_idx, global_rank, world_size, device, args.batch_size

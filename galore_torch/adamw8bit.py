@@ -25,6 +25,9 @@ class AdamW8bit(Optimizer2State):
 
         overflows = []
 
+        device_type = torch.accelerator.current_accelerator().type if hasattr(torch, "accelerator") else "cuda"
+        torch_accelerator_module = getattr(torch, device_type)
+
         if not self.initialized:
             self.check_overrides()
             self.to_gpu()  # needed for fairseq pure fp16 training
@@ -68,7 +71,7 @@ class AdamW8bit(Optimizer2State):
 
                 self.prefetch_state(p)
                 self.update_step(group, p, gindex, pindex)
-                torch.cuda.synchronize()
+                torch_accelerator_module.synchronize()
                 
                 # GaLore Projection Back
                 if "rank" in group:
@@ -83,7 +86,7 @@ class AdamW8bit(Optimizer2State):
         if self.is_paged:
             # all paged operation are asynchronous, we need
             # to sync to make sure all tensors are in the right state
-            torch.cuda.synchronize()
+            torch_accelerator_module.synchronize()
 
 
         return loss

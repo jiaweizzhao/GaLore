@@ -33,7 +33,8 @@ train_loader, test_loaders, data_processor = load_darcy_flow_small(
 )
 # %%
 # Choose device
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device_type = torch.accelerator.current_accelerator().type if hasattr(torch, "accelerator") else "cpu"
+device = torch.device(device_type)
 
 # %%
 # Set up the incremental FNO model
